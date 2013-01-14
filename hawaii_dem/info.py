@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# see
+# see http://home.gdal.org/projects/aigrid/aigrid_format.html
 
 import struct
 

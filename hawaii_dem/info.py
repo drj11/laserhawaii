@@ -30,3 +30,29 @@ def adfIndex(filename='w001001x.adf'):
 
 index = adfIndex()
 print index[:10]
+
+class Struct:
+  def __init__(self, **k):
+    self.__dict__.update(k)
+
+  def __repr__(self):
+      return "Struct(%r)" % self.__dict__
+
+def adfHeader(filename='hdr.adf'):
+    bytes = open(filename).read()
+    magic = bytes[0:8]
+    exemplar = 'GRID1.2\x00'
+    if magic != exemplar:
+      raise BadMagic("magic %s exemplar %s" %
+        (magic.encode('hex'), exemplar.encode('hex')))
+    celltype,compression = struct.unpack(">2l", bytes[16:24])
+    pixelsize = struct.unpack(">2d", bytes[256:272])
+    reference = struct.unpack(">2d", bytes[272:288])
+    tiletiles = struct.unpack(">2l", bytes[288:296])
+    w,dummy_,h = struct.unpack(">3l", bytes[296:308])
+    return Struct(celltype=celltype, compression=compression,
+      pixelsize=pixelsize, reference=reference,
+      tiletiles=tiletiles, tilesize=(w,h))
+
+
+print adfHeader()

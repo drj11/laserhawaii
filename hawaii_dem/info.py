@@ -11,7 +11,6 @@ def bounds(filename='dblbnd.adf'):
 
 # For the Hawaii DEM file the bound are in meters, referenced to
 # some particular UTM coordinate system.
-print "bounds", bounds()
 
 def adfIndex(filename='w001001x.adf'):
     """Returns a list of pairs."""
@@ -30,15 +29,12 @@ def adfIndex(filename='w001001x.adf'):
       l.append(pointer)
     return l
 
-index = adfIndex()
-print index[:10]
-
 class Struct:
-  def __init__(self, **k):
-    self.__dict__.update(k)
+    def __init__(self, **k):
+        self.__dict__.update(k)
 
-  def __repr__(self):
-      return "Struct(%r)" % self.__dict__
+    def __repr__(self):
+        return "Struct(%r)" % self.__dict__
 
 def adfHeader(filename='hdr.adf'):
     bytes = open(filename).read()
@@ -57,4 +53,35 @@ def adfHeader(filename='hdr.adf'):
       tiletiles=tiletiles, tilesize=(w,h))
 
 
-print adfHeader()
+class Raster:
+    def __init__(self, header=adfHeader(), index=adfIndex(),
+      filename="w001001.adf"):
+        self.header = header
+        self.index = index
+        self.fd = open(filename, 'rb')
+        self.celltype = self.header.celltype
+
+    def tile(self, i):
+      pointer = self.index[i]
+      o,s = pointer
+      self.fd.seek(2*o)
+      bytes = self.fd.read(2 + 2*s)
+      if self.celltype == 2:
+        # Each float is stored as 4 bytes in order:
+        # B A D C
+        # where A B C D is the normal order (with the
+        # exponent in the A byte)
+        shorts = struct.unpack("<%dH" % s, bytes[2:])
+        swabbed = struct.pack(">%dH" % s, *shorts)
+        res = struct.unpack(">%df" % (s//2), swabbed)
+        return res
+      return bytes
+
+def main():
+    print "bounds", bounds()
+    print adfHeader()
+    index = adfIndex()
+    print index[:10]
+
+if __name__ == '__main__':
+    main()

@@ -9,7 +9,9 @@ def bounds(filename='dblbnd.adf'):
     bounds = struct.unpack('>4d', bytes)
     return bounds
 
-print "bounds (*10e-4 degrees?)", bounds()
+# For the Hawaii DEM file the bound are in meters, referenced to
+# some particular UTM coordinate system.
+print "bounds", bounds()
 
 def adfIndex(filename='w001001x.adf'):
     """Returns a list of pairs."""

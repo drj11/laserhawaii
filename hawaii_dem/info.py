@@ -61,21 +61,34 @@ class Raster:
         self.fd = open(filename, 'rb')
         self.celltype = self.header.celltype
 
+    def tileRaw(self, i):
+        pointer = self.index[i]
+        o,s = pointer
+        self.fd.seek(2*o)
+        bytes = self.fd.read(2 + 2*s)
+        if self.celltype == 2:
+            # Each float is stored as 4 bytes in order:
+            # B A D C
+            # where A B C D is the normal order (with the
+            # most of the exponent in the A byte)
+            shorts = struct.unpack("<%dH" % s, bytes[2:])
+            swabbed = struct.pack(">%dH" % s, *shorts)
+            res = struct.unpack(">%df" % (s//2), swabbed)
+            return res
+        return bytes
+
     def tile(self, i):
-      pointer = self.index[i]
-      o,s = pointer
-      self.fd.seek(2*o)
-      bytes = self.fd.read(2 + 2*s)
-      if self.celltype == 2:
-        # Each float is stored as 4 bytes in order:
-        # B A D C
-        # where A B C D is the normal order (with the
-        # exponent in the A byte)
-        shorts = struct.unpack("<%dH" % s, bytes[2:])
-        swabbed = struct.pack(">%dH" % s, *shorts)
-        res = struct.unpack(">%df" % (s//2), swabbed)
-        return res
-      return bytes
+        """Return a sequence of sequences (a 2D "array" if you
+        like)."""
+
+        w,h = self.header.tilesize
+
+        return list(grouper(w, self.tileRaw(i)))
+
+# http://docs.python.org/2/library/itertools.html#recipes
+def grouper(n, i):
+  args = [iter(i)]*n
+  return zip(*args)
 
 def main():
     print "bounds", bounds()

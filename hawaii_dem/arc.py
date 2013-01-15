@@ -71,13 +71,7 @@ class Raster:
         self.fd.seek(2*o)
         bytes = self.fd.read(2 + 2*s)
         if self.celltype == 2:
-            # Each float is stored as 4 bytes in order:
-            # B A D C
-            # where A B C D is the normal order (with the
-            # most of the exponent in the A byte)
-            shorts = struct.unpack("<%dH" % s, bytes[2:])
-            swabbed = struct.pack(">%dH" % s, *shorts)
-            res = struct.unpack(">%df" % (s//2), swabbed)
+            res = struct.unpack(">%df" % (s//2), bytes[2:])
             return res
         return bytes
 

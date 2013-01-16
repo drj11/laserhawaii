@@ -3,6 +3,9 @@
 
 # see http://home.gdal.org/projects/aigrid/aigrid_format.html
 
+# For the Hawaii DEM file the bound are in meters, referenced to
+# some particular UTM coordinate system.
+
 import itertools
 import operator
 import struct
@@ -13,8 +16,8 @@ def bounds(filename='dblbnd.adf'):
     bounds = struct.unpack('>4d', bytes)
     return bounds
 
-# For the Hawaii DEM file the bound are in meters, referenced to
-# some particular UTM coordinate system.
+def stats(filename='sta.adf'):
+    return bounds(filename)
 
 def adfIndex(filename='w001001x.adf'):
     """Returns a list of pairs."""
@@ -106,6 +109,7 @@ def grouper(n, i):
 
 def main():
     print "bounds", bounds()
+    print "stats: min %f, max %f, mean %f, stddev %f" % tuple(stats())
     print adfHeader()
     index = adfIndex()
     print index[:10]

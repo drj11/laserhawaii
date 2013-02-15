@@ -16,7 +16,7 @@ def bounds(filename='dblbnd.adf'):
     bounds = struct.unpack('>4d', bytes)
     return bounds
 
-def stats(filename='sta.adf'):
+def adfStats(filename='sta.adf'):
     return bounds(filename)
 
 def adfIndex(filename='w001001x.adf'):
@@ -62,9 +62,11 @@ def adfHeader(filename='hdr.adf'):
 
 class Raster:
     def __init__(self, header=adfHeader(), index=adfIndex(),
+      stats=adfStats(),
       filename="w001001.adf"):
         self.header = header
         self.index = index
+        self.stats = stats
         self.fd = open(filename, 'rb')
         self.celltype = self.header.celltype
 
@@ -109,7 +111,8 @@ def grouper(n, i):
 
 def main():
     print "bounds", bounds()
-    print "stats: min %f, max %f, mean %f, stddev %f" % tuple(stats())
+    print "stats: min %f, max %f, mean %f, stddev %f" % tuple(
+      adfStats())
     print adfHeader()
     index = adfIndex()
     print index[:10]

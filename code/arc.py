@@ -61,9 +61,15 @@ def adfHeader(filename='hdr.adf'):
 
 
 class Raster:
-    def __init__(self, header=adfHeader(), index=adfIndex(),
-      stats=adfStats(),
+    def __init__(self, header=None, index=None,
+      stats=None,
       filename="w001001.adf"):
+        if header is None:
+            header = adfHeader()
+        if index is None:
+            index = adfIndex()
+        if stats is None:
+            stats = adfStats()
         self.header = header
         self.index = index
         self.stats = stats

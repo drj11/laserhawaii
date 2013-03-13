@@ -2,10 +2,12 @@
 
 # Make 6 layers from PGM input file.
 
+mkdir -p output
+
 for l in 1 2 3 4 5 6
 do
     r=0.$((10000*$l/7))
-    out=${1%.pgm}_$l.svg
+    out=output/${1%.pgm}_$l.svg
     potrace -k $r --invert --svg < $1 |
       sed 's/fill="[^"]*/fill="none/;s/stroke="[^"]*/stroke="#000/' > $out
 done

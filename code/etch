@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Add to SVG file $1 an etch layer for $2.
+# A new (composed) SVG file is output on stdout.
+
+# Assumes SVG files are in a particular format output by 
+# potrace.
+
+: ${2?2 arguments should be supplied}
+
+# etch layer is converted to red.
+
+sed '$d' $1
+sed -n 's/#000/#f00/;/<g/,/<\/g>/p' $2
+printf '</svg>\n'
